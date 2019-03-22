@@ -1,0 +1,25 @@
+package com.function.iBlog.service.impl.user;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.function.iBlog.dao.user.UserDao;
+import com.function.iBlog.service.user.UserService;
+import com.function.iBlog.vo.UserVO;
+
+public class UserServiceImpl implements UserService
+{
+    @Autowired
+	private UserDao dao;
+
+    @Override
+    public UserVO selectUserByLoginName(String username)
+    {
+	UserVO ret=dao.selectUserByLoginName(username);
+	return ret;
+    }
+
+}

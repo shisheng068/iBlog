@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-lazy-init="true">
+
+	<description>Shiro安全配置</description>
+
+	<!-- Shiro's main business-tier object for web-enabled applications -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="sessionManager" ref="sessionManager"></property>
+		<property name="realm" ref="shiroDbRealm" />
+	</bean>
+
+	<!-- 项目自定义的Realm -->
+	<bean id="shiroDbRealm" class="com.function.iBlog.service.impl.shiro.ShiroDbRealm">
+	</bean>
+	
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<!-- <property name="sessionListeners" ref="tokenListener"></property> -->
+		<property name="globalSessionTimeout" value="1200000"></property>
+		<property name="sessionIdCookieEnabled" value="true"></property>  
+		<property name="sessionIdCookie" ref="simpleCookie"></property>
+	</bean>
+	
+	<!-- <bean id="tokenListener" class="cn.com.gw.listener.TokenListener"></bean> -->
+	
+	<bean id="simpleCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg value="sid"/>
+		<property name="httpOnly" value="${shiro.cookie.http}"></property>
+		<property name="domain" value="${shiro.cookie.domain}"></property>
+		<property name="path" value="${shiro.cookie.path}"></property>
+	</bean>
+
+	<!-- 支持 Shiro对Controller的方法级AOP安全控制 begin-->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor">
+        <!-- <property name="proxyTargetClass" value="true" /> -->
+    </bean>
+    
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+    
+    <!-- 支持 Shiro对Controller的方法级AOP安全控制 end  -->
+    
+    <!-- shiro未登录异常拦截 -->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">
+					/index
+				</prop>
+				<prop key="org.apache.shiro.authz.UnauthenticatedException">
+					/index
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Shiro Filter -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login/login.shtml" />
+		<property name="successUrl" value="/login/toLogin.shtml" />
+		<property name="unauthorizedUrl" value="/login/login.shtml" />
+		<!-- 单点登录限制 -->
+		<!-- <property name="filters">
+            <map>
+                扩展登录令牌过滤器
+                <entry key="user" value-ref="customUserFilter"/>
+            </map>
+        </property> -->
+		<property name="filterChainDefinitions">
+			<value>
+				/css/** = anon
+				/images/** = anon
+				/js/** = anon
+				/login.do = anon
+				/loginout.do = anon
+		 	</value>
+		</property>
+	</bean>
+
+	
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+	
+	<!-- 单点登录限制 -->
+	<!-- <bean id="customUserFilter" class="com.finc.bee.filter.CustomUserFilter"/> -->
+	
+</beans>

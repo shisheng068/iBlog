@@ -1,0 +1,18 @@
+package com.function.iBlog.dao.user;
+
+import java.util.Map;
+
+import com.function.iBlog.vo.UserVO;
+
+public interface UserDao
+{
+
+    /**
+     * 根据用户名查询用户信息
+     * @param map
+     * 		loginName 登录名  邮箱、手机、用户名均可
+     * @return
+     */
+    UserVO selectUserByLoginName(String loginName);
+
+}

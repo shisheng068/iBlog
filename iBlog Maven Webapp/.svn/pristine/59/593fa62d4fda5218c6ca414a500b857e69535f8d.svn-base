@@ -1,0 +1,91 @@
+package com.function.iBlog.service.user;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import com.function.iBlog.vo.ReturnDto;
+import com.function.iBlog.vo.UserVO;
+
+public interface UserService
+{
+
+    /**
+     * 根据用户名查询用户
+     * username 用户名
+     * @return
+     */
+    public UserVO selectUserByLoginName(String username);
+
+    /**
+     * 根据ID查询用户
+     * @param userid
+     * @return
+     */
+    public UserVO selectUserByID(int userid);
+
+    /**
+     * 根据ID修改用户昵称
+     * @param userid
+     * @param newNickName
+     * @return
+     */
+    public ReturnDto changeUserNickName(int userid, String newNickName);
+    
+    /**
+     * 验证昵称是否可用
+     * @param newNickName
+     * @return
+     */
+    public ReturnDto checkNickName(String newNickName);
+    
+    /**
+     * 根据用户信息查询用户列表
+     * @param map
+     *        	<br>complete_nickName  完整的昵称
+     *          <br>part_nickName      部分昵称
+     *          <br>complete_userName  完整的用户名
+     *          <br>part_userName      部分用户名
+     *          <br>complete_phone     完整的手机号
+     *          <br>part_phone         部分手机号
+     *          <br>complete_email     完整的邮箱
+     *          <br>part_email         部分邮箱地址
+     * @return
+     */
+    public List<UserVO> selectUserByUserInfo(Map<String, Object> map);
+    
+    /**
+     * 验证手机号是否可用
+     * @param phoneNum
+     * @return
+     */
+    public ReturnDto checkPhone(String phoneNum);
+
+    /**
+     * 修改用户手机号
+     * @param userid
+     * @param msgValiCode
+     * @param newPhoneNum
+     * @param session
+     * @return
+     */
+    public ReturnDto changePhoneNum(int userid, String msgValiCode,
+	    String newPhoneNum, HttpSession session);
+
+    /**
+     * 修改邮箱
+     * @param userid
+     * @param email
+     * @return
+     */
+	public ReturnDto changeUserEmail(int userid, String email);
+	
+	/**
+	 * 验证用户邮箱是否可用
+	 * @param email
+	 * @return
+	 */
+	public ReturnDto checkEmail(String email);
+
+}

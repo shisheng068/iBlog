@@ -1,0 +1,38 @@
+package com.function.iBlog.controller.login;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+@RequestMapping("/login")
+public class LoginController {
+	
+	/**
+	 * 登录页面
+	 * @param msg
+	 * @return
+	 */
+	@RequestMapping(value = "/login",method = RequestMethod.GET)
+	public ModelAndView toLogin(String msg,HttpServletRequest request){
+		Map<String,Object> model = new HashMap<String,Object>();
+		if(StringUtils.isEmpty(msg)){
+			HttpSession session = request.getSession();
+			if(null==session.getAttribute("loginMsg"))
+				msg ="";
+			else
+				msg = String.valueOf(session.getAttribute("loginMsg"));
+			session.setAttribute("loginMsg", null);
+		}
+		model.put("msg", msg);
+		return new ModelAndView("/login", model);
+	}
+}

@@ -1,0 +1,259 @@
+package com.function.iBlog.service.impl.user;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.function.iBlog.common.util.CheckoutUtil;
+import com.function.iBlog.dao.user.UserDao;
+import com.function.iBlog.service.captcha.MsgCaptchaService;
+import com.function.iBlog.service.user.UserService;
+import com.function.iBlog.vo.ReturnDto;
+import com.function.iBlog.vo.UserVO;
+
+public class UserServiceImpl implements UserService
+{
+    @Autowired
+    private UserDao dao;
+    
+    @Autowired
+    private MsgCaptchaService msgCaptchaService;
+
+    @Override
+    public UserVO selectUserByLoginName(String username)
+    {
+    	UserVO ret=dao.selectUserByLoginName(username);
+    	return ret;
+    }
+
+    @Override
+    public UserVO selectUserByID(int userid)
+    {
+    	UserVO ret=dao.selectUserByID(userid);
+    	return ret;
+    }
+
+    @Override
+    public ReturnDto changeUserNickName(int userid, String newNickName)
+    {
+		// TODO 判断昵称是否可用
+		ReturnDto ret = new ReturnDto();
+		
+		ReturnDto checkRet = this.checkNickName(newNickName);
+		if(checkRet.isSuccess())
+		{
+		    dao.changeUserNickName(userid,newNickName);
+		    ret.setMsg("修改昵称操作成功!");
+		    ret.setSuccess(true);
+		    ret.setReturnCode("success");
+		}
+		else
+		{
+		    ret.setMsg("昵称已被占用!");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("duplicated nickname");
+		}
+		return ret;
+    }
+
+    @Override
+    public ReturnDto checkNickName(String newNickName)
+    {
+		ReturnDto ret = new ReturnDto();
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put("complete_nickName", newNickName);
+		List<UserVO> userList = this.selectUserByUserInfo(map);
+		if(userList.isEmpty())
+		{
+		    ret.setMsg("昵称可用");
+		    ret.setSuccess(true);
+		    ret.setReturnCode("pass");
+		}
+		else
+		{
+		    ret.setMsg("无效昵称,昵称已被占用!");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("duplicated nickname");
+		}
+		return ret;
+    }
+
+    @Override
+    public List<UserVO> selectUserByUserInfo(Map<String, Object> map)
+    {
+    	List<UserVO> userList = dao.selectUserByUserInfo(map);
+    	return userList;
+    }
+
+    @Override
+    public ReturnDto changePhoneNum(int userid, String msgValiCode,
+	    String newPhoneNum, HttpSession session)
+    {
+		ReturnDto ret = new ReturnDto();
+		
+		if(null==newPhoneNum||StringUtils.isEmpty(newPhoneNum))
+		{
+		    ret.setMsg("新手机号错误");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("errorNewPhoneNum");
+		    return ret;
+		}
+		
+		ReturnDto checkRet = checkPhone(newPhoneNum);
+		if(!checkRet.isSuccess())
+		{
+			return checkRet;
+		}
+		
+		checkRet = msgCaptchaService.checkMsgValicode(msgValiCode, session, true);
+		if(!checkRet.isSuccess())
+		{
+		    return checkRet;
+		}
+		
+		boolean flag = dao.changeUserPhoneNum(userid,newPhoneNum);
+		
+		if(!flag)
+		{
+			ret.setMsg("设置出错");
+			ret.setSuccess(false);
+			ret.setReturnCode("errorInDao");
+			return ret;
+		}
+		
+		ret.setMsg("新手机号修改成功");
+		ret.setSuccess(true);
+		ret.setReturnCode("success");
+		return ret;
+    }
+
+	@Override
+	public ReturnDto changeUserEmail(int userid, String email) 
+	{
+		
+		ReturnDto ret = new ReturnDto();
+		
+		boolean flag = CheckoutUtil.trueEmailAddr(email);
+		if(!flag)
+		{
+			ret.setMsg("邮箱地址有误");
+			ret.setReturnCode("errorEmailAddr");
+			ret.setSuccess(false);
+			
+			return ret;
+		}
+		
+		ReturnDto checkRet = checkEmail(email);
+		if(!checkRet.isSuccess())
+		{
+		    return checkRet;
+		}
+		
+		//TODO 验证邮箱验证码
+		
+		flag = dao.changeUserEmail(userid,email);
+		
+		if(!flag)
+		{
+			ret.setMsg("设置出错");
+			ret.setSuccess(false);
+			ret.setReturnCode("errorInDao");
+			return ret;
+		}
+		
+		ret.setMsg("邮箱地址修改成功");
+		ret.setSuccess(true);
+		ret.setReturnCode("success");
+		return ret;
+		
+	}
+
+	@Override
+	public ReturnDto checkPhone(String phoneNum) {
+		ReturnDto ret = new ReturnDto();
+		
+		boolean flag = CheckoutUtil.trueMobiPhoneNum(phoneNum);
+		if(!flag)
+		{
+			ret.setMsg("无效手机号!");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("errorPhoneNum");
+		    return ret;
+		}
+		
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put("complete_phoneNum", phoneNum);
+		List<UserVO> userList = this.selectUserByUserInfo(map);
+		if(userList.isEmpty())
+		{
+		    ret.setMsg("手机号可用");
+		    ret.setSuccess(true);
+		    ret.setReturnCode("success");
+		}
+		else
+		{
+		    ret.setMsg("手机号已被占用!");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("duplicated phoneNum");
+		}
+		return ret;
+	}
+
+	@Override
+	public ReturnDto checkEmail(String email) {
+		
+		ReturnDto ret = new ReturnDto();
+		
+		boolean flag = CheckoutUtil.trueEmailAddr(email);
+		if(!flag)
+		{
+			ret.setMsg("无效邮箱地址!");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("errorEmail");
+		    return ret;
+		}
+		
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put("complete_email", email);
+		List<UserVO> userList = this.selectUserByUserInfo(map);
+		if(userList.isEmpty())
+		{
+		    ret.setMsg("邮箱地址可用");
+		    ret.setSuccess(true);
+		    ret.setReturnCode("success");
+		}
+		else
+		{
+		    ret.setMsg("邮箱地址已被占用!");
+		    ret.setSuccess(false);
+		    ret.setReturnCode("duplicated phoneNum");
+		}
+		return ret;
+	}
+
+	@Override
+	public ReturnDto changeUserFaceImg(int userid, String faceImg) {
+		ReturnDto ret = new ReturnDto();
+		boolean flag;
+		flag = dao.changeUserFaceImg(userid,faceImg);
+		if(!flag)
+		{
+			ret.setMsg("设置出错");
+			ret.setSuccess(false);
+			ret.setReturnCode("errorInDao");
+			return ret;
+		}
+		
+		ret.setMsg("用户头像修改成功");
+		ret.setSuccess(true);
+		ret.setReturnCode("success");
+		return ret;
+	}
+
+}

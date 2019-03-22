@@ -1,0 +1,22 @@
+package com.function.iBlog.dao.impl.user;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.function.iBlog.dao.impl.BaseDao;
+import com.function.iBlog.dao.user.UserDao;
+import com.function.iBlog.vo.UserVO;
+
+public class UserDaoImpl extends BaseDao implements UserDao
+{
+
+    @Override
+    public UserVO selectUserByLoginName(String loginName)
+    {
+	Map<String, Object> queryMap = new HashMap<String, Object>();
+	queryMap.put("loginName", loginName);
+	UserVO ret =sqlSession.selectOne("com.lingcong.mybatis.user.selectUserByLoginName", queryMap);
+	return ret;
+    }
+
+}

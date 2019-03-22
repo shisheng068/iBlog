@@ -1,0 +1,69 @@
+package com.function.iBlog.service.impl.shiro;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.function.iBlog.service.role.RoleService;
+import com.function.iBlog.service.user.UserService;
+import com.function.iBlog.vo.UserVO;
+
+
+public class ShiroDbRealm extends AuthorizingRealm {
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private RoleService roleService;
+	
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(
+			PrincipalCollection principals) {
+		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		// 获取当前登录的用户名
+		UserVO user = (UserVO) super.getAvailablePrincipal(principals);
+
+		List<String> permissions = null;
+
+		if (user != null) {
+			// 加载用户拥有的权限
+			permissions = roleService.selectPermissSnByUserID(user.getUserid());
+		} else {
+			throw new AuthorizationException();
+		}
+		// 给当前用户设置权限
+		info.addStringPermissions(permissions);
+		return info;
+	}
+
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(
+			AuthenticationToken authcToken) throws AuthenticationException {
+		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
+		// 根据账号获取用户信息
+		UserVO user = userService.selectUserByLoginName(token.getUsername());
+		// 设置登录时间
+		user.setLoginTime(new Date());
+
+		if (user != null) {
+			return new SimpleAuthenticationInfo(user, user.getPassword(),
+					getName());
+		} 
+		else
+			return null;
+	}
+}

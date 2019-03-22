@@ -1,0 +1,33 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lingcong.mybatis.user">
+	<resultMap type="userVO" id="userReturnMap" autoMapping="true">
+		<result property="id" column="id" />
+	</resultMap>
+	
+	<select id="selectUserByLoginName" resultMap="userReturnMap" parameterType="map">
+		SELECT
+			utb.userid,
+			utb.username,
+			utb.`password`,
+			utb.salt,
+			utb.nickname,
+			utb.phone,
+			utb.email,
+			utb.createtime,
+			utb.loginstate,
+			utb.faceimgurl
+		FROM
+			iblog_user AS utb
+		WHERE
+		<if test="null!=loginName">
+			utb.username = #{loginName}
+			OR utb.phone = #{loginName}
+			OR utb.email = #{loginName}
+		</if>
+		<if test="null==loginName">
+			1=2
+		</if> 
+	</select>
+	
+</mapper>
+

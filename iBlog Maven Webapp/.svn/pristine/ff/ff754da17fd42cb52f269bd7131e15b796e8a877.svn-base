@@ -1,0 +1,16 @@
+package com.function.iBlog.service.pemission;
+
+import java.util.List;
+
+import com.function.iBlog.vo.MenuVO;
+
+public interface PemissionService {
+
+	/**
+	 * 根据ID查询用户可用右侧菜单
+	 * @param userid
+	 * @return
+	 */
+	public List<MenuVO> selectLeftNavMenuByUserID(int userid,boolean isLogin);
+
+}

@@ -1,0 +1,12 @@
+.tpl-table-black-operation a 
+{
+  display: inline-block;
+  padding: 5px 6px;
+  font-size: 12px;
+  line-height: 12px;
+}
+
+.mytable-hidden
+{
+	display: none;
+}

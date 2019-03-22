@@ -1,0 +1,28 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lingcong.mybatis.role">
+	
+	<resultMap type="roleVO" id="roleVOMap" autoMapping="true">
+		<result property="roleid" column="roleid" />
+	</resultMap>
+	
+	<select id="selectPermissSnByUserID" parameterType="map" resultType="String">
+        SELECT DISTINCT
+		lap.SN
+		FROM
+		(select * from lingcong_api_roleuser AS lartemp WHERE lartemp.USERID=<if test="null==userID">0</if><if test="null!=userID">#{userID}</if>) AS laru
+		INNER JOIN lingcon_api_role AS lar ON laru.ROLEID = lar.ID AND lar.STATE = 1
+		INNER JOIN lingcong_api_rolepemission AS larp ON larp.roleID = lar.ID
+		INNER JOIN lingcong_api_permission AS lap ON larp.pemissionID = lap.ID AND lap.STATE = 1
+		
+		SELECT DISTINCT
+			ptb.sn
+		FROM
+			iblog_userrole AS urtb
+		INNER JOIN iblog_role AS rtb ON urtb.roleid = rtb.roleid AND urtb.userid = <if test="null==userID">0</if><if test="null!=userID">#{userID}</if>
+		INNER JOIN iblog_rolepemission AS rptb ON rptb.roleid = rtb.roleid
+		INNER JOIN iblog_permission AS ptb ON rptb.permissionid = ptb.permissionid
+		
+ 	</select>
+ 	
+</mapper>
+

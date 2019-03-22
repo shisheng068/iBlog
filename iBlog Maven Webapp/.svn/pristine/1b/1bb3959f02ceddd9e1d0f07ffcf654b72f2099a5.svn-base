@@ -1,0 +1,22 @@
+package com.function.iBlog.common.util;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
+import com.function.iBlog.vo.UserVO;
+
+
+public class UserUtils {
+	
+	/**
+	 * 获取已登录的用户VO
+	 * @return
+	 */
+	public static UserVO findLoginUser(){
+		Subject subject = SecurityUtils.getSubject();
+		UserVO ret = (UserVO)subject.getPrincipal();
+		if(null==ret)
+			ret = new UserVO();
+		return ret;
+	}
+}

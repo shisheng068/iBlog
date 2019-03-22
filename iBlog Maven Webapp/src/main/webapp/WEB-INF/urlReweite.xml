@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlrewrite>
+
+	<rule>
+	   <note>将.shtml转为.do</note>
+	   <from>^/(.*).shtml</from>
+	   <to type="forward">/$1.do</to>
+	</rule>
+  
+</urlrewrite>

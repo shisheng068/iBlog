@@ -1,0 +1,19 @@
+package com.function.iBlog.dao.pemission;
+
+import java.util.List;
+import java.util.Map;
+
+import com.function.iBlog.vo.MenuVO;
+
+public interface PemissionDao {
+
+	/**
+	 * 根据条件查询用户可用左侧导航菜单
+	 * @param userid
+	 * @param alluser
+	 * @param isLogin
+	 * @return
+	 */
+	public List<MenuVO> selectLeftNavMenuByUserID(int userid,boolean alluser,boolean isLogin);
+
+}

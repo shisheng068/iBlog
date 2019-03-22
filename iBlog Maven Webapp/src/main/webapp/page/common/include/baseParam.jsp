@@ -1,0 +1,7 @@
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+String imgBasePath = basePath;
+String baseHost = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+pageContext.setAttribute("basePath",basePath);    
+%>

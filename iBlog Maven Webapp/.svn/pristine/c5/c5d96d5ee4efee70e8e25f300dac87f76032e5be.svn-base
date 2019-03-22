@@ -1,0 +1,3 @@
+shiro.cookie.http=true
+shiro.cookie.domain=
+shiro.cookie.path=

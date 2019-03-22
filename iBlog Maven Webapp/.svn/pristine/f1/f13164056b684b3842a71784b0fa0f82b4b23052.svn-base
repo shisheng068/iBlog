@@ -1,0 +1,15 @@
+package com.function.iBlog.service.user;
+
+import com.function.iBlog.vo.UserVO;
+
+public interface UserService
+{
+
+    /**
+     * 根据用户名查询用户
+     * username 用户名
+     * @return
+     */
+    UserVO selectUserByLoginName(String username);
+
+}
