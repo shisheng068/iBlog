@@ -1,0 +1,1 @@
+INSERT INTO `iblog`.`iblog_user` (`userid`, `username`, `password`, `salt`, `nickname`, `phone`, `email`, `createtime`, `loginstate`, `faceimgurl`) VALUES ('1', 'admin', 'f024f922bc137ffda5dd3f1b7a3c97ed', 'DQfyShJm', 'admin', '15002128673', 'shisheng068@163.com', '2017-06-13 00:38:28', '1', NULL);
